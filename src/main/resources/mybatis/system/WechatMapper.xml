@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.wechat.mapper.TWechatMapper">
+
+    <resultMap type="TWechat" id="TWechatResult">
+        <result property="id"    column="id"    />
+        <result property="wechatNumber"    column="wechat_number"    />
+        <result property="departmentId"    column="department_id"    />
+        <result property="description"    column="description"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createUser"    column="create_user"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateUser"    column="update_user"    />
+        <association property="dept"     javaType="Dept" resultMap="deptResult" />
+    </resultMap>
+
+    <resultMap id="deptResult" type="Dept">
+        <id     property="deptId"    column="dept_id"     />
+        <result property="parentId"  column="parent_id"   />
+        <result property="ancestors" column="ancestors"   />
+        <result property="deptName"  column="dept_name"   />
+        <result property="orderNum"  column="order_num"   />
+        <result property="leader"    column="leader"      />
+        <result property="status"    column="dept_status" />
+    </resultMap>
+
+    <sql id="selectTWechatVo">
+        select id, wechat_number, department_id, description, create_time, create_user, update_time, update_user from t_wechat
+    </sql>
+
+    <select id="selectTWechatList" parameterType="TWechat" resultMap="TWechatResult">
+        select w.id, w.wechat_number, w.department_id, w.description, w.create_time, w.create_user, w.update_time, w.update_user, d.dept_name, d.leader from t_wechat w
+        left join sys_dept d on w.department_id = d.dept_id
+        <where>
+            <if test="wechatNumber != null  and wechatNumber != ''"> and wechat_number = #{wechatNumber}</if>
+            <if test="departmentId != null "> and department_id = #{departmentId}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="createUser != null "> and create_user = #{createUser}</if>
+            <if test="updateUser != null "> and update_user = #{updateUser}</if>
+        </where>
+    </select>
+
+    <select id="selectTWechatById" parameterType="Long" resultMap="TWechatResult">
+        select w.id, w.wechat_number, w.department_id, w.description, w.create_time, w.create_user, w.update_time, w.update_user, d.dept_name, d.leader from t_wechat w
+        left join sys_dept d on w.department_id = d.dept_id
+        where id = #{id}
+    </select>
+
+    <insert id="insertTWechat" parameterType="TWechat" useGeneratedKeys="true" keyProperty="id">
+        insert into t_wechat
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="wechatNumber != null">wechat_number,</if>
+            <if test="departmentId != null">department_id,</if>
+            <if test="description != null">description,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateUser != null">update_user,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="wechatNumber != null">#{wechatNumber},</if>
+            <if test="departmentId != null">#{departmentId},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateUser != null">#{updateUser},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTWechat" parameterType="TWechat">
+        update t_wechat
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="wechatNumber != null">wechat_number = #{wechatNumber},</if>
+            <if test="departmentId != null">department_id = #{departmentId},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createUser != null">create_user = #{createUser},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTWechatById" parameterType="Long">
+        delete from t_wechat where id = #{id}
+    </delete>
+
+    <delete id="deleteTWechatByIds" parameterType="String">
+        delete from t_wechat where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
